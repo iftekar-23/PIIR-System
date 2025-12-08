@@ -1,18 +1,20 @@
 import React, { useState } from "react";
 import { Link, NavLink } from "react-router";
+import useAuth from "../../hooks/useAuth";
+
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false); // Mobile menu
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const user = null; // Replace with auth data
-
+  const { user, logOut } = useAuth(); 
   const navItemStyle =
     "hover:text-blue-600 transition font-medium text-gray-700";
 
   return (
     <nav className="w-full bg-white border-b border-slate-200 py-4 shadow-sm sticky top-0 z-50">
       <div className="flex items-center justify-between px-4 md:px-8">
+        
         {/* LOGO */}
         <Link to="/" className="text-3xl font-bold text-blue-600 tracking-wide">
           CityFix
@@ -23,22 +25,19 @@ const Navbar = () => {
           <NavLink to="/" className={navItemStyle}>
             Home
           </NavLink>
-
           <NavLink to="/issues" className={navItemStyle}>
             All Issues
           </NavLink>
-
           <NavLink to="/about" className={navItemStyle}>
             About Us
           </NavLink>
-
           <NavLink to="/contact" className={navItemStyle}>
             Contact
           </NavLink>
         </div>
 
-        {/* PROFILE / LOGIN */}
-        <div className="hidden md:block">
+        {/* PROFILE / LOGIN (DESKTOP) */}
+        <div className="hidden md:block relative">
           {!user ? (
             <Link
               to="/login"
@@ -47,26 +46,33 @@ const Navbar = () => {
               Login
             </Link>
           ) : (
-            <div className="relative">
+            <>
               <img
                 src={user.photoURL}
+                alt="profile"
                 className="h-10 w-10 rounded-full cursor-pointer border"
                 onClick={() => setOpen(!open)}
-                alt="profile"
               />
               {open && (
-                <div className="absolute right-0 bg-white shadow-md p-4 w-40 rounded-lg border">
-                  <p className="font-medium">{user.displayName}</p>
+                <div className="absolute right-0 mt-2 bg-white shadow-lg border w-48 rounded-lg p-3">
+                  <p className="font-semibold text-gray-700">
+                    {user.displayName || "User"}
+                  </p>
                   <Link
                     to="/dashboard"
                     className="block mt-2 text-blue-600 hover:underline"
                   >
                     Dashboard
                   </Link>
-                  <button className="text-red-500 mt-2">Logout</button>
+                  <button
+                    className="text-red-500 mt-3 font-medium"
+                    onClick={logOut}
+                  >
+                    Logout
+                  </button>
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
 
@@ -85,19 +91,17 @@ const Navbar = () => {
           <NavLink to="/" className={navItemStyle}>
             Home
           </NavLink>
-
           <NavLink to="/issues" className={navItemStyle}>
             All Issues
           </NavLink>
-
           <NavLink to="/about" className={navItemStyle}>
             About Us
           </NavLink>
-
           <NavLink to="/contact" className={navItemStyle}>
             Contact
           </NavLink>
 
+          {/* MOBILE PROFILE */}
           {!user ? (
             <Link
               to="/login"
@@ -106,12 +110,29 @@ const Navbar = () => {
               Login
             </Link>
           ) : (
-            <div>
-              <p className="font-medium">{user.displayName}</p>
-              <Link to="/dashboard" className="text-blue-600 block">
+            <div className="pt-3 border-t">
+              <div className="flex items-center gap-3">
+                <img
+                  src={user.photoURL}
+                  className="h-10 w-10 rounded-full border"
+                  alt="profile"
+                />
+                <p className="font-semibold">{user.displayName}</p>
+              </div>
+
+              <Link
+                to="/dashboard"
+                className="text-blue-600 block mt-2 font-medium"
+              >
                 Dashboard
               </Link>
-              <button className="text-red-500 mt-2">Logout</button>
+
+              <button
+                className="text-red-500 mt-2 font-medium"
+                onClick={logOut}
+              >
+                Logout
+              </button>
             </div>
           )}
         </div>
