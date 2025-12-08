@@ -10,7 +10,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-const BannerSlider = () => {
+const Banner = () => {
   const slides = [
     {
       id: 1,
@@ -81,4 +81,4 @@ const BannerSlider = () => {
   );
 };
 
-export default BannerSlider;
+export default Banner;

@@ -5,22 +5,23 @@ import About from "../pages/About";
 import Contact from "../pages/Contact";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
+import AllIssues from "../pages/AllIssues";
 
 export const router = createBrowserRouter([
     {
-        path:'/',
+        path: '/',
         element: <RootLayout></RootLayout>,
-        children:([
+        children: ([
             {
-                index:true,
+                index: true,
                 element: <Home></Home>
             },
             {
-                path:'/about',
+                path: '/about',
                 element: <About></About>
             },
             {
-                path:'/contact',
+                path: '/contact',
                 element: <Contact></Contact>
             },
             {
@@ -31,6 +32,11 @@ export const router = createBrowserRouter([
                 path: '/register',
                 element: <Register></Register>
             },
+            {
+                path: "/issues",
+                element: <AllIssues />,
+                loader: () => fetch("/issues.json").then(res => res.json())
+            }
         ])
     }
 ])

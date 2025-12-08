@@ -1,0 +1,141 @@
+[
+  {
+    "id": "101",
+    "title": "Broken Street Light",
+    "category": "Infrastructure",
+    "status": "Pending",
+    "priority": "High",
+    "upvotes": 12,
+    "location": "Mirpur 10, Dhaka",
+    "image": "https://i.ibb.co/8ng4tHLS/images-12.jpg",
+    "userEmail": "user1@gmail.com"
+  },
+  {
+    "id": "102",
+    "title": "Garbage Dump on Road",
+    "category": "Environment",
+    "status": "Resolved",
+    "priority": "Normal",
+    "upvotes": 30,
+    "location": "Uttara Sector 4",
+    "image": "https://i.ibb.co.com/hJVfsS3h/unauthorized-garbage-dump-along-the-road-photo.jpg",
+    "userEmail": "user2@gmail.com"
+  },
+  {
+    "id": "103",
+    "title": "Water Leakage Problem",
+    "category": "Utilities",
+    "status": "In Progress",
+    "priority": "High",
+    "upvotes": 22,
+    "location": "Bashundhara Block B",
+    "image": "https://i.ibb.co.com/Vcy1ZdJq/images-13.jpg",
+    "userEmail": "user3@gmail.com"
+  },
+  {
+    "id": "104",
+    "title": "Damaged Road",
+    "category": "Infrastructure",
+    "status": "Pending",
+    "priority": "Normal",
+    "upvotes": 18,
+    "location": "Dhanmondi 32",
+    "image": "https://i.ibb.co.com/PG8kKCyc/360-F-1218201012-FPd-Z9-Qu6-Zji-H4h-Bg6-HCG0jr-IV54-Ww-Vk-V.jpg",
+    "userEmail": "user4@gmail.com"
+  },
+  {
+    "id": "105",
+    "title": "Drain Blockage",
+    "category": "Utilities",
+    "status": "Pending",
+    "priority": "High",
+    "upvotes": 40,
+    "location": "Banani 11",
+    "image": "https://i.ibb.co.com/SDhm3mBX/Adobe-Stock-88628181-1024x717.jpg",
+    "userEmail": "user5@gmail.com"
+  },
+
+  {
+    "id": "106",
+    "title": "Tree Fallen on Road",
+    "category": "Environment",
+    "status": "In Progress",
+    "priority": "High",
+    "upvotes": 15,
+    "location": "Gulshan 2",
+    "image": "https://i.ibb.co.com/XrVqQPMq/download-3.jpg",
+    "userEmail": "user6@gmail.com"
+  },
+
+  {
+    "id": "107",
+    "title": "Illegal Parking",
+    "category": "Transport",
+    "status": "Pending",
+    "priority": "Normal",
+    "upvotes": 9,
+    "location": "Kamal Ataturk Ave",
+    "image": "https://i.ibb.co.com/7dk9tJ0W/51af1962-6277-449d-93ac-eae842e59af3.webp",
+    "userEmail": "user7@gmail.com"
+  },
+
+  {
+    "id": "108",
+    "title": "Manhole Without Cover",
+    "category": "Safety",
+    "status": "In Progress",
+    "priority": "High",
+    "upvotes": 33,
+    "location": "Farmgate",
+    "image": "https://i.ibb.co.com/N6Y1FVVQ/images-14.jpg",
+    "userEmail": "user8@gmail.com"
+  },
+
+  {
+    "id": "109",
+    "title": "Broken Traffic Signal",
+    "category": "Transport",
+    "status": "Resolved",
+    "priority": "Normal",
+    "upvotes": 26,
+    "location": "Shahbagh",
+    "image": "https://i.ibb.co.com/rGRTbrjZ/20220323-101752.webp",
+    "userEmail": "user9@gmail.com"
+  },
+
+  {
+    "id": "110",
+    "title": "Noise Pollution",
+    "category": "Environment",
+    "status": "Pending",
+    "priority": "Normal",
+    "upvotes": 7,
+    "location": "Mohakhali",
+    "image": "https://i.ibb.co.com/mWYzFgh/noise-pollution-blog.jpg",
+    "userEmail": "user10@gmail.com"
+  },
+
+  {
+    "id": "111",
+    "title": "Street Dog Attack",
+    "category": "Safety",
+    "status": "Pending",
+    "priority": "High",
+    "upvotes": 45,
+    "location": "Rampura",
+    "image": "https://i.ibb.co.com/PsLL4BMb/122167095.avif",
+    "userEmail": "user11@gmail.com"
+  },
+
+  {
+    "id": "112",
+    "title": "Flooding During Rain",
+    "category": "Utilities",
+    "status": "In Progress",
+    "priority": "High",
+    "upvotes": 55,
+    "location": "Mirpur 1",
+    "image": "https://i.ibb.co.com/FkKHZWp0/img-8077.jpg",
+    "userEmail": "user12@gmail.com"
+  }
+]
