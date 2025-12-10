@@ -3,18 +3,18 @@ import { Link, NavLink } from "react-router";
 import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
 import useRole from "../../hooks/useRole";
+import { FaHome } from "react-icons/fa";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { user, logOut } = useAuth();
-  const { role } = useRole()
+  const { role } = useRole();
 
   const navItemStyle =
     "hover:text-blue-600 transition font-medium text-gray-700";
 
-  // LOGOUT HANDLER WITH SWEETALERT2
   const handleLogout = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -26,7 +26,6 @@ const Navbar = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await logOut();
-
         Swal.fire({
           title: "Logged Out!",
           text: "You have successfully logged out.",
@@ -55,7 +54,7 @@ const Navbar = () => {
           <NavLink to="/contact" className={navItemStyle}>Contact</NavLink>
         </div>
 
-        {/* PROFILE / LOGIN (DESKTOP) */}
+        {/* PROFILE / LOGIN */}
         <div className="hidden md:block relative">
           {!user ? (
             <Link
@@ -72,46 +71,40 @@ const Navbar = () => {
                 className="h-10 w-10 rounded-full cursor-pointer border"
                 onClick={() => setOpen(!open)}
               />
+
               {open && (
                 <div className="absolute right-0 mt-2 bg-white shadow-lg border w-48 rounded-lg p-3">
-                  <p className="font-semibold text-gray-700">
+                  <p className="font-semibold text-gray-700 mb-2">
                     {user.displayName || "User"}
                   </p>
 
-                  {open && (
-  <div className="absolute right-0 mt-2 bg-white shadow-lg border w-48 rounded-lg p-3">
-    <p className="font-semibold text-gray-700">
-      {user.displayName || "User"}
-    </p>
+                  {role === "admin" && (
+                    <Link to="/dashboard/admin-home"
+                      className="block text-blue-600 hover:underline"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
 
-    {role === "admin" && (
-      <Link to="/dashboard/admin-home" className="block mt-2 text-blue-600 hover:underline">
-        Admin Dashboard
-      </Link>
-    )}
+                  {role === "staff" && (
+                    <Link to="/dashboard/staff-home"
+                      className="block text-blue-600 hover:underline"
+                    >
+                      Staff Dashboard
+                    </Link>
+                  )}
 
-    {role === "staff" && (
-      <Link to="/dashboard/staff-home" className="block mt-2 text-blue-600 hover:underline">
-        Staff Dashboard
-      </Link>
-    )}
-
-    {role === "citizen" && (
-      <Link to="/dashboard/citizen-home" className="block mt-2 text-blue-600 hover:underline">
-        My Dashboard
-      </Link>
-    )}
-
-    <button className="text-red-500 mt-3 font-medium" onClick={handleLogout}>
-      Logout
-    </button>
-  </div>
-)}
-
+                  {role === "citizen" && (
+                    <Link to="/dashboard/citizen-home"
+                      className="block text-blue-600 hover:underline"
+                    >
+                      My Dashboard
+                    </Link>
+                  )}
 
                   <button
-                    className="text-red-500 mt-3 font-medium"
                     onClick={handleLogout}
+                    className="text-red-500 mt-3 font-medium"
                   >
                     Logout
                   </button>
@@ -138,7 +131,6 @@ const Navbar = () => {
           <NavLink to="/about" className={navItemStyle}>About Us</NavLink>
           <NavLink to="/contact" className={navItemStyle}>Contact</NavLink>
 
-          {/* MOBILE PROFILE */}
           {!user ? (
             <Link
               to="/login"
@@ -148,48 +140,29 @@ const Navbar = () => {
             </Link>
           ) : (
             <div className="pt-3 border-t">
-              <div className="flex items-center gap-3">
-                <img
-                  src={user.photoURL}
-                  className="h-10 w-10 rounded-full border"
-                  alt="profile"
-                />
-                <p className="font-semibold">{user.displayName}</p>
-              </div>
 
-             {open && (
-  <div className="absolute right-0 mt-2 bg-white shadow-lg border w-48 rounded-lg p-3">
-    <p className="font-semibold text-gray-700">
-      {user.displayName || "User"}
-    </p>
+              <p className="font-semibold">{user.displayName}</p>
 
-    {role === "admin" && (
-      <Link to="/dashboard/admin-home" className="block mt-2 text-blue-600 hover:underline">
-        Admin Dashboard
-      </Link>
-    )}
+              {role === "admin" && (
+                <Link to="/dashboard/admin-home" className="text-blue-600 block mt-2">
+                  Admin Dashboard
+                </Link>
+              )}
 
-    {role === "staff" && (
-      <Link to="/dashboard/staff-home" className="block mt-2 text-blue-600 hover:underline">
-        Staff Dashboard
-      </Link>
-    )}
+              {role === "staff" && (
+                <Link to="/dashboard/staff-home" className="text-blue-600 block mt-2">
+                  Staff Dashboard
+                </Link>
+              )}
 
-    {role === "citizen" && (
-      <Link to="/dashboard/citizen-home" className="block mt-2 text-blue-600 hover:underline">
-        My Dashboard
-      </Link>
-    )}
-
-    <button className="text-red-500 mt-3 font-medium" onClick={handleLogout}>
-      Logout
-    </button>
-  </div>
-)}
-
+              {role === "citizen" && (
+                <Link to="/dashboard/citizen-home" className="text-blue-600 block mt-2">
+                  My Dashboard
+                </Link>
+              )}
 
               <button
-                className="text-red-500 mt-2 font-medium"
+                className="text-red-500 mt-3 font-medium"
                 onClick={handleLogout}
               >
                 Logout

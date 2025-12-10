@@ -9,6 +9,13 @@ import AllIssues from "../pages/AllIssues";
 import PrivateRoute from "./PrivateRoute";
 import IssueDetails from "../pages/IssueDetails";
 import BoostSuccess from "../pages/BoostSuccess";
+import DashboardLayout from "../layouts/DashboardLayout";
+import AdminRoute from "./AdminRoute";
+import AdminHome from "../pages/Dashboard/Admin/AdminHome";
+import StaffRoute from "./StaffRoute";
+import StaffHome from "../pages/Dashboard/Staff/StaffHome";
+import CitizenRoute from "./CitizenRoute";
+import CitizenHome from "../pages/Dashboard/Citizen/CitizenHome";
 
 export const router = createBrowserRouter([
     {
@@ -49,5 +56,35 @@ export const router = createBrowserRouter([
                 element: <BoostSuccess />
             }
         ])
+    },
+    {
+        path: "/dashboard",
+        element: <DashboardLayout />,
+        children: [
+            {
+                path: "admin-home",
+                element: (
+                    <AdminRoute>
+                        <AdminHome />
+                    </AdminRoute>
+                ),
+            },
+            {
+                path: "staff-home",
+                element: (
+                    <StaffRoute>
+                        <StaffHome />
+                    </StaffRoute>
+                ),
+            },
+            {
+                path: "citizen-home",
+                element: (
+                    <CitizenRoute>
+                        <CitizenHome />
+                    </CitizenRoute>
+                ),
+            },
+        ]
     }
 ])

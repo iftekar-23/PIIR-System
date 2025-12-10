@@ -3,10 +3,12 @@ import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router";
 import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 
 const Register = () => {
   const { registerUser, googleLogin, updateUserProfile } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
 
   const {
@@ -15,10 +17,26 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
+  const saveUser = async (userObj) => {
+  try {
+    const res = await axiosSecure.post("/users", userObj);
+    console.log("User saved:", res.data);
+  } catch (error) {
+    console.error("User save failed:", error.response?.data || error);
+  }
+};
+
   const onSubmit = async (data) => {
     try {
-      await registerUser(data.email, data.password);
+      const cred = await registerUser(data.email, data.password);
       await updateUserProfile({ displayName: data.name });
+
+      await saveUser({
+        name: data.name,
+        email: data.email,
+        photoURL: cred.user.photoURL || "",
+      });
+
       navigate("/");
     } catch (err) {
       alert(err.message);
@@ -27,7 +45,14 @@ const Register = () => {
 
   const handleGoogleRegister = async () => {
     try {
-      await googleLogin();
+      const result = await googleLogin();
+
+      await saveUser({
+        name: result.user.displayName,
+        email: result.user.email,
+        photoURL: result.user.photoURL,
+      });
+
       navigate("/");
     } catch (err) {
       console.log(err.message);
@@ -62,7 +87,10 @@ const Register = () => {
             type="password"
             placeholder="Password"
             className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-            {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })}
+            {...register("password", {
+              required: "Password is required",
+              minLength: { value: 6, message: "Password must be at least 6 characters" },
+            })}
           />
           {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
