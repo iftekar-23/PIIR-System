@@ -7,11 +7,18 @@ import CitizenSidebar from "../pages/Dashboard/CitizenSidebar";
 import { FaHome } from "react-icons/fa";
 
 const DashboardLayout = () => {
-  const { role } = useRole();
+  const { role, loading } = useRole();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-700 text-lg">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">
-
       {/* SIDEBAR */}
       <div className="w-64 bg-white shadow-lg h-screen p-5 flex flex-col fixed left-0 top-0">
         <Link

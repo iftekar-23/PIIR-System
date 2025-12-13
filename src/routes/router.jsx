@@ -16,6 +16,17 @@ import StaffRoute from "./StaffRoute";
 import StaffHome from "../pages/Dashboard/Staff/StaffHome";
 import CitizenRoute from "./CitizenRoute";
 import CitizenHome from "../pages/Dashboard/Citizen/CitizenHome";
+import MyIssues from "../pages/Dashboard/Citizen/MyIssues";
+import SubmitIssue from "../pages/Dashboard/Citizen/SubmitIssue";
+import Profile from "../pages/Dashboard/Citizen/Profile";
+import AssignedIssues from "../pages/Dashboard/Staff/AssignedIssues";
+import StaffProfile from "../pages/Dashboard/Staff/StaffProfile";
+import AdminIssues from "../pages/Dashboard/Admin/AdminIssues";
+import AdminUsers from "../pages/Dashboard/Admin/AdminUsers";
+import AdminStaff from "../pages/Dashboard/Admin/AdminStaff";
+import AdminPayments from "../pages/Dashboard/Admin/AdminPayments";
+import AdminProfile from "../pages/Dashboard/Admin/AdminProfile";
+import SubscribeSuccess from "../pages/Dashboard/Citizen/SubscribeSuccess";
 
 export const router = createBrowserRouter([
     {
@@ -54,6 +65,10 @@ export const router = createBrowserRouter([
             {
                 path: "/boost-success",
                 element: <BoostSuccess />
+            },
+            {
+                path: "/subscribe-success",
+                element: <SubscribeSuccess />
             }
         ])
     },
@@ -61,6 +76,7 @@ export const router = createBrowserRouter([
         path: "/dashboard",
         element: <DashboardLayout />,
         children: [
+
             {
                 path: "admin-home",
                 element: (
@@ -69,11 +85,32 @@ export const router = createBrowserRouter([
                     </AdminRoute>
                 ),
             },
+            { path: 'all-issues', element: <AdminRoute><AdminIssues /></AdminRoute> },
+            { path: 'admin-users', element: <AdminRoute><AdminUsers /></AdminRoute> },
+            { path: 'manage-staff', element: <AdminRoute><AdminStaff /></AdminRoute> },
+            { path: 'payments', element: <AdminRoute><AdminPayments /></AdminRoute> },
+            { path: 'profile', element: <AdminRoute><AdminProfile /></AdminRoute> },
             {
                 path: "staff-home",
                 element: (
                     <StaffRoute>
                         <StaffHome />
+                    </StaffRoute>
+                ),
+            },
+            {
+                path: "assigned-issues",
+                element: (
+                    <StaffRoute>
+                        <AssignedIssues />
+                    </StaffRoute>
+                ),
+            },
+            {
+                path: "profile",
+                element: (
+                    <StaffRoute>
+                        <StaffProfile />
                     </StaffRoute>
                 ),
             },
@@ -85,6 +122,31 @@ export const router = createBrowserRouter([
                     </CitizenRoute>
                 ),
             },
+            {
+                path: "my-issues",
+                element: (
+                    <CitizenRoute>
+                        <MyIssues />
+                    </CitizenRoute>
+                ),
+            },
+            {
+                path: "submit-issue",
+                element: (
+                    <CitizenRoute>
+                        <SubmitIssue />
+                    </CitizenRoute>
+                ),
+            },
+            {
+                path: "citizen-profile",
+                element: (
+                    <CitizenRoute>
+                        <Profile />
+                    </CitizenRoute>
+                ),
+            },
+            
         ]
     }
 ])

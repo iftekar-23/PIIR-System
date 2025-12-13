@@ -71,9 +71,11 @@ const IssueDetails = () => {
             });
 
             if (res.data?.url) {
-                // redirect to Stripe checkout
+                // Keep React Router context + token
                 window.location.href = res.data.url;
-            } else {
+                
+            }
+            else {
                 alert("Failed to start payment session.");
             }
         } catch (err) {

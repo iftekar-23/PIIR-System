@@ -1,12 +1,16 @@
 import { Navigate } from "react-router";
 import useRole from "../hooks/useRole";
+import useAuth from "../hooks/useAuth";
 
 const StaffRoute = ({ children }) => {
-  const { role, isLoading } = useRole();
+  const { user } = useAuth();
+  const { role, loading } = useRole();
 
-  if (isLoading) return <p>Loading...</p>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (role !== "staff") return <Navigate to="/" replace />;
 
-  return role === "staff" ? children : <Navigate to="/unauthorized" />;
+  return children;
 };
 
 export default StaffRoute;
