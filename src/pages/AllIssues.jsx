@@ -43,7 +43,7 @@ const AllIssues = () => {
 
         axiosSecure.patch(`/issues/upvote/${issue._id}`, { email: user.email })
             .then(() => {
-                // 🔥 UI Update instantly
+            
                 const updated = issues.map(i =>
                     i._id === issue._id
                         ? { ...i, upvotes: i.upvotes + 1 }

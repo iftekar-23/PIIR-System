@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { FaBan, FaCheckCircle } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const AdminUsers = () => {
   const axiosSecure = useAxiosSecure();
@@ -10,7 +11,7 @@ const AdminUsers = () => {
   const [activeTab, setActiveTab] = useState("citizens");
   const [loading, setLoading] = useState(true);
 
-  // Fetch citizens & staff separately (matches backend)
+  /* ---------------- Fetch Data ---------------- */
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -32,18 +33,51 @@ const AdminUsers = () => {
     fetchData();
   }, []);
 
+  /* ---------------- Block / Unblock ---------------- */
   const toggleBlock = async (email, isBlocked) => {
-    const action = isBlocked ? "unblock" : "block";
-    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+    const action = isBlocked ? "Unblock" : "Block";
+    const actionColor = isBlocked ? "#16a34a" : "#dc2626";
 
-    const endpoint = isBlocked
-      ? `/admin/users/${email}/unblock`
-      : `/admin/users/${email}/block`;
+    const result = await Swal.fire({
+      title: `${action} this user?`,
+      text: isBlocked
+        ? "The user will regain access to the system."
+        : "The user will be restricted from accessing the system.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: action,
+      confirmButtonColor: actionColor,
+      cancelButtonText: "Cancel",
+    });
 
-    await axiosSecure.patch(endpoint);
-    fetchData();
+    if (!result.isConfirmed) return;
+
+    try {
+      const endpoint = isBlocked
+        ? `/admin/users/${email}/unblock`
+        : `/admin/users/${email}/block`;
+
+      await axiosSecure.patch(endpoint);
+
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: `User has been ${isBlocked ? "unblocked" : "blocked"} successfully`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      fetchData();
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Action failed. Please try again.",
+      });
+    }
   };
 
+  /* ---------------- Table ---------------- */
   const Table = ({ data = [] }) => (
     <div className="overflow-x-auto">
       <table className="min-w-full text-sm">

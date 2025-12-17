@@ -13,13 +13,14 @@ import {
   MapPin,
 } from "lucide-react";
 
-/* -------------------- Issue Card -------------------- */
+/* -------------------- Status Badge -------------------- */
 const StatusBadge = ({ status }) => {
   const colors = {
-    pending: "bg-yellow-100 text-yellow-700",
-    "in-progress": "bg-blue-100 text-blue-700",
-    resolved: "bg-green-100 text-green-700",
-    rejected: "bg-red-100 text-red-700",
+    Pending: "bg-yellow-100 text-yellow-700",
+    "In Progress": "bg-blue-100 text-blue-700",
+    Working: "bg-indigo-100 text-indigo-700",
+    Resolved: "bg-green-100 text-green-700",
+    Closed: "bg-gray-200 text-gray-700",
   };
 
   return (
@@ -33,6 +34,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+/* -------------------- Issue Card -------------------- */
 const IssueCard = ({ issue, onEditClick, onDelete }) => (
   <div className="bg-white rounded-2xl border shadow-sm p-5 hover:shadow-md transition">
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -53,11 +55,12 @@ const IssueCard = ({ issue, onEditClick, onDelete }) => (
       </div>
 
       <div className="flex items-center gap-2">
+        {/* Edit only when Pending */}
         <button
-          disabled={issue.status !== "pending"}
+          disabled={issue.status !== "Pending"}
           onClick={() => onEditClick(issue)}
           className={`p-2 rounded-lg border hover:bg-gray-50 ${
-            issue.status !== "pending"
+            issue.status !== "Pending"
               ? "opacity-40 cursor-not-allowed"
               : ""
           }`}
@@ -95,13 +98,14 @@ const MyIssues = () => {
 
   const { register, handleSubmit, reset } = useForm();
 
+  /* ---------------- Fetch ---------------- */
   const fetchIssues = async () => {
     setLoading(true);
     try {
       const res = await axiosSecure.get(
         `/issues?userEmail=${user.email}`
       );
-      setIssues(res.data);
+      setIssues(res.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -169,6 +173,7 @@ const MyIssues = () => {
     }
   };
 
+  /* ---------------- Filter ---------------- */
   const displayed = issues.filter(
     (i) =>
       (!filter.status || i.status === filter.status) &&
@@ -192,27 +197,31 @@ const MyIssues = () => {
         <Filter size={18} className="text-gray-500" />
 
         <select
+          value={filter.status}
           onChange={(e) =>
             setFilter({ ...filter, status: e.target.value })
           }
           className="p-2 border rounded-lg"
         >
           <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="in-progress">In Progress</option>
-          <option value="resolved">Resolved</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Working">Working</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Closed">Closed</option>
         </select>
 
         <select
+          value={filter.category}
           onChange={(e) =>
             setFilter({ ...filter, category: e.target.value })
           }
           className="p-2 border rounded-lg"
         >
           <option value="">All Categories</option>
-          <option value="road">Road</option>
-          <option value="water">Water</option>
-          <option value="garbage">Garbage</option>
+          <option value="Road">Road</option>
+          <option value="Water">Water</option>
+          <option value="Garbage">Garbage</option>
         </select>
 
         <button

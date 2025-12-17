@@ -6,19 +6,13 @@ import StatusBadge from "./components/StatusBadge";
 import PriorityBadge from "./components/PriorityBadge";
 import FilterBar from "./components/FilterBar";
 
-
+/* ===================== STATUS FLOW ===================== */
 const STATUS_FLOW = {
   Pending: ["In Progress"],
   "In Progress": ["Working"],
   Working: ["Resolved"],
   Resolved: ["Closed"],
 };
-
-const formatStatus = (status) =>
-  status
-    .split("-")
-    .map((w) => w[0].toUpperCase() + w.slice(1))
-    .join(" ");
 
 const AssignedIssues = () => {
   const axiosSecure = useAxiosSecure();
@@ -27,9 +21,9 @@ const AssignedIssues = () => {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // filters
-  const [status, setStatus] = useState("");
-  const [priority, setPriority] = useState("");
+  /* ---------------- Filters (DB-compatible) ---------------- */
+  const [status, setStatus] = useState("");      // Pending | In Progress | ...
+  const [priority, setPriority] = useState("");  // Low | Medium | High
   const [search, setSearch] = useState("");
 
   /* ===================== LOAD ISSUES ===================== */
@@ -39,13 +33,15 @@ const AssignedIssues = () => {
     const loadIssues = async () => {
       setLoading(true);
       try {
-        const q = new URLSearchParams({ email: user.email });
-        if (status) q.set("status", status);
-        if (priority) q.set("priority", priority);
-        if (search) q.set("search", search);
+        const params = new URLSearchParams();
+        params.set("email", user.email);
+
+        if (status) params.set("status", status);       // EXACT DB value
+        if (priority) params.set("priority", priority); // EXACT DB value
+        if (search) params.set("search", search.trim());
 
         const res = await axiosSecure.get(
-          `/dashboard/staff/issues?${q.toString()}`
+          `/dashboard/staff/issues?${params.toString()}`
         );
 
         setIssues(res.data || []);
@@ -63,9 +59,9 @@ const AssignedIssues = () => {
   const changeStatus = async (issueId, newStatus) => {
     const previous = [...issues];
 
-    // Optimistic UI update
-    setIssues((list) =>
-      list.map((issue) =>
+    // optimistic update
+    setIssues(list =>
+      list.map(issue =>
         issue._id === issueId ? { ...issue, status: newStatus } : issue
       )
     );
@@ -73,25 +69,25 @@ const AssignedIssues = () => {
     try {
       const res = await axiosSecure.patch(
         `/dashboard/staff/status/${issueId}`,
-        { newStatus } // must be DB format
+        { newStatus }
       );
 
-      const updatedIssue = res.data.issue;
-
-      setIssues((list) =>
-        list.map((issue) => (issue._id === issueId ? updatedIssue : issue))
+      setIssues(list =>
+        list.map(issue =>
+          issue._id === issueId ? res.data.issue : issue
+        )
       );
     } catch (err) {
       console.error("Status update failed", err);
       setIssues(previous);
-      alert("Status update failed. Please try again.");
+      alert("Status update failed");
     }
   };
 
   /* ===================== UI ===================== */
   if (loading) {
     return (
-      <div className="min-h-[200px] flex items-center justify-center text-slate-300">
+      <div className="min-h-[200px] flex items-center justify-center text-slate-400">
         Loading issues...
       </div>
     );
@@ -100,8 +96,11 @@ const AssignedIssues = () => {
   return (
     <div className="space-y-4 text-slate-100">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-blue-700">Assigned Issues</h2>
+        <h2 className="text-xl font-semibold text-blue-700">
+          Assigned Issues
+        </h2>
 
+        {/* IMPORTANT: FilterBar must send DB values */}
         <FilterBar
           status={status}
           setStatus={setStatus}
@@ -116,13 +115,13 @@ const AssignedIssues = () => {
         <table className="min-w-full text-left">
           <thead className="bg-[#071a36]">
             <tr>
-              <th className="px-4 py-3 text-sm text-slate-300">Title</th>
-              <th className="px-4 py-3 text-sm text-slate-300">Category</th>
-              <th className="px-4 py-3 text-sm text-slate-300">Location</th>
-              <th className="px-4 py-3 text-sm text-slate-300">Priority</th>
-              <th className="px-4 py-3 text-sm text-slate-300">Status</th>
-              <th className="px-4 py-3 text-sm text-slate-300">Created</th>
-              <th className="px-4 py-3 text-sm text-slate-300">Action</th>
+              <th className="px-4 py-3">Title</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Location</th>
+              <th className="px-4 py-3">Priority</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Created</th>
+              <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
 
@@ -135,7 +134,7 @@ const AssignedIssues = () => {
               </tr>
             )}
 
-            {issues.map((issue) => (
+            {issues.map(issue => (
               <tr
                 key={issue._id}
                 className="border-t border-[#0b2238] hover:bg-[#042037]"
@@ -149,21 +148,21 @@ const AssignedIssues = () => {
                   </Link>
                 </td>
 
-                <td className="px-4 py-3 text-slate-300">{issue.category}</td>
-                <td className="px-4 py-3 text-slate-300">{issue.location}</td>
+                <td className="px-4 py-3">{issue.category}</td>
+                <td className="px-4 py-3">{issue.location}</td>
                 <td className="px-4 py-3">
                   <PriorityBadge priority={issue.priority} />
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={issue.status} />
                 </td>
-                <td className="px-4 py-3 text-slate-400 text-sm">
+                <td className="px-4 py-3 text-sm text-slate-400">
                   {new Date(issue.createdAt).toLocaleString()}
                 </td>
                 <td className="px-4 py-3">
                   <StatusChanger
                     current={issue.status}
-                    onChange={(ns) => changeStatus(issue._id, ns)}
+                    onChange={ns => changeStatus(issue._id, ns)}
                   />
                 </td>
               </tr>
@@ -180,13 +179,13 @@ export default AssignedIssues;
 /* ===================== STATUS CHANGER (DROP-UP) ===================== */
 function StatusChanger({ current, onChange }) {
   const [open, setOpen] = useState(false);
-  const options = STATUS_FLOW[current] || []; // DB-compatible status
+  const options = STATUS_FLOW[current] || [];
 
   return (
     <div className="relative inline-block">
       <button
-        onClick={() => setOpen(v => !v)}
-        className="px-3 py-1 bg-violet-600 hover:bg-violet-700 text-white rounded text-sm transition"
+        onClick={() => setOpen(o => !o)}
+        className="px-3 py-1 bg-violet-600 hover:bg-violet-700 text-white rounded text-sm"
       >
         Change
       </button>
@@ -194,19 +193,21 @@ function StatusChanger({ current, onChange }) {
       {open && (
         <div className="absolute right-0 bottom-full mb-2 w-44 bg-[#031428] border border-[#123] rounded-lg shadow-xl z-50">
           {options.length === 0 && (
-            <div className="px-3 py-2 text-slate-400 text-sm">No actions available</div>
+            <div className="px-3 py-2 text-slate-400 text-sm">
+              No actions available
+            </div>
           )}
 
           {options.map(opt => (
             <button
               key={opt}
               onClick={() => {
-                onChange(opt); // Send DB-compatible status
+                onChange(opt);
                 setOpen(false);
               }}
-              className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-[#04263b] transition"
+              className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-[#04263b]"
             >
-              {opt} {/* Already readable */}
+              {opt}
             </button>
           ))}
         </div>
@@ -214,4 +215,3 @@ function StatusChanger({ current, onChange }) {
     </div>
   );
 }
-

@@ -1,16 +1,15 @@
-// BannerSlider.jsx
-// https://i.ibb.co.com/pjKFZN3W/computer-fixes-reporting.jpg"
-// https://i.ibb.co.com/4wbD7PRG/shipping-logistic-delivery-freight-cargo-concept-53876-124951.avif
-// https://i.ibb.co.com/bgWMQ2RR/hq720.jpg
-// BannerSlider.jsx
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
+import { motion } from "framer-motion";
+import { gsap } from "gsap";
 
 import "swiper/css";
 import "swiper/css/pagination";
 
 const Banner = () => {
+  const bannerRef = useRef(null);
+  
   const slides = [
     {
       id: 1,
@@ -32,9 +31,24 @@ const Banner = () => {
     },
   ];
 
+  useEffect(() => {
+    if (bannerRef.current) {
+      gsap.fromTo(bannerRef.current,
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 1.2, ease: "power2.out" }
+      );
+    }
+  }, []);
+
   return (
-    <div className="w-full flex justify-center my-10">
-      <div className="w-[70%] md:w-[75%] sm:w-[90%]">
+    <motion.div 
+      className="w-full flex justify-center my-10"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      data-aos="fade-up"
+    >
+      <div ref={bannerRef} className="w-[70%] md:w-[75%] sm:w-[90%]">
         <Swiper
           modules={[Autoplay, Pagination]}
           autoplay={{ delay: 3000 }}
@@ -43,41 +57,72 @@ const Banner = () => {
           spaceBetween={20}
           className="rounded-2xl overflow-hidden"
         >
-          {slides.map((s) => (
+          {slides.map((s, index) => (
             <SwiperSlide key={s.id}>
-              <div
+              <motion.div
                 className="h-[60vh] w-full rounded-2xl bg-cover bg-center bg-no-repeat flex items-center"
                 style={{
                   backgroundImage: `url(${s.img})`,
                 }}
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.8 }}
               >
                 {/* DARK OVERLAY */}
                 <div className="bg-black/40 w-full h-full flex items-center justify-center text-center rounded-2xl p-10">
                   <div className="max-w-2xl text-white space-y-4">
-                    <h1 className="text-3xl md:text-4xl font-bold leading-tight drop-shadow-lg">
+                    <motion.h1 
+                      className="text-3xl md:text-4xl font-bold leading-tight drop-shadow-lg"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                    >
                       {s.title}
-                    </h1>
+                    </motion.h1>
 
-                    <p className="text-gray-200 text-lg drop-shadow-md">
+                    <motion.p 
+                      className="text-gray-200 text-lg drop-shadow-md"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8, delay: 0.4 }}
+                    >
                       {s.desc}
-                    </p>
+                    </motion.p>
 
-                    <div className="flex gap-4 justify-center pt-4">
-                      <button className="bg-white text-blue-600 px-6 py-3 rounded-md font-semibold hover:bg-gray-200 transition">
-                        Report an Issue
-                      </button>
-                      <button className="border border-white px-6 py-3 rounded-md hover:bg-white hover:text-blue-600 transition">
-                        View Issues
-                      </button>
-                    </div>
+                    <motion.div 
+                      className="flex gap-4 justify-center pt-4"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8, delay: 0.6 }}
+                    >
+                      <motion.button 
+                        className="bg-white text-blue-600 px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <span className="relative z-10">🚀 Report an Issue</span>
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-0"
+                          whileHover={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </motion.button>
+                      <motion.button 
+                        className="border-2 border-white px-8 py-4 rounded-2xl font-bold hover:bg-white hover:text-blue-600 transition-all duration-300 backdrop-blur-sm bg-white/10"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        🔍 View Issues
+                      </motion.button>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
