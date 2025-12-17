@@ -5,7 +5,7 @@ const StaffSidebar = () => (
     <Link to="/dashboard/staff-home" className="block font-medium hover:text-blue-600 text-left">Dashboard</Link>
     <Link to="/dashboard/assigned-issues" className="block font-medium hover:text-blue-600 text-left">Assigned Issues</Link>
    
-    <Link to="/dashboard/profile" className="block font-medium hover:text-blue-600 text-left">Profile</Link>
+    <Link to="/dashboard/staff-profile" className="block font-medium hover:text-blue-600 text-left">Profile</Link>
   </div>
 );
 

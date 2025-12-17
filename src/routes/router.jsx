@@ -74,7 +74,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "/dashboard",
-        element: <DashboardLayout />,
+        element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
         children: [
 
             {
@@ -107,7 +107,7 @@ export const router = createBrowserRouter([
                 ),
             },
             {
-                path: "profile",
+                path: "staff-profile",
                 element: (
                     <StaffRoute>
                         <StaffProfile />

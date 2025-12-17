@@ -1,31 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, Outlet } from "react-router";
 import useRole from "../hooks/useRole";
 import AdminSidebar from "../pages/Dashboard/AdminSidebar";
 import StaffSidebar from "../pages/Dashboard/StaffSidebar";
 import CitizenSidebar from "../pages/Dashboard/CitizenSidebar";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaBars } from "react-icons/fa";
 
 const DashboardLayout = () => {
   const { role, loading } = useRole();
+  const [open, setOpen] = useState(false);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-700 text-lg">Loading dashboard...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        Loading dashboard...
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen">
-      {/* SIDEBAR */}
-      <div className="w-64 bg-white shadow-lg h-screen p-5 flex flex-col fixed left-0 top-0">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-blue-600 font-bold text-lg mb-5 hover:text-blue-700"
-        >
-          <FaHome /> Back to Home
+
+      {/* MOBILE SIDEBAR */}
+      <div
+        className={`fixed inset-y-0 left-0 bg-white shadow-lg w-64 p-5 z-50 transform ${
+          open ? "translate-x-0" : "-translate-x-full"
+        } transition md:hidden`}
+      >
+        <button onClick={() => setOpen(false)} className="mb-4">
+          ✕
+        </button>
+
+        <Link to="/" className="flex items-center gap-2 text-blue-600 mb-5">
+          <FaHome /> Home
         </Link>
 
         {role === "admin" && <AdminSidebar />}
@@ -33,8 +40,26 @@ const DashboardLayout = () => {
         {role === "citizen" && <CitizenSidebar />}
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex-1 ml-64 p-6">
+      {/* DESKTOP SIDEBAR */}
+      <div className="hidden md:block w-64 bg-white shadow-lg p-5">
+        <Link to="/" className="flex items-center gap-2 text-blue-600 mb-5">
+          <FaHome /> Home
+        </Link>
+
+        {role === "admin" && <AdminSidebar />}
+        {role === "staff" && <StaffSidebar />}
+        {role === "citizen" && <CitizenSidebar />}
+      </div>
+
+      {/* CONTENT */}
+      <div className="flex-1 p-6">
+        <button
+          onClick={() => setOpen(true)}
+          className="md:hidden mb-4 text-xl"
+        >
+          <FaBars />
+        </button>
+
         <Outlet />
       </div>
     </div>

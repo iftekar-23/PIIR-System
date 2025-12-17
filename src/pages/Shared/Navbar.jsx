@@ -1,118 +1,166 @@
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 import useAuth from "../../hooks/useAuth";
 import useRole from "../../hooks/useRole";
 import Swal from "sweetalert2";
+import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 
 const Navbar = () => {
-  const [open, setOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
   const { user, logOut } = useAuth();
-  const { role, loading } = useRole(); // loading check added
+  const { role, loading } = useRole();
+  const location = useLocation();
 
-  const navItemStyle = "hover:text-blue-600 transition font-medium text-gray-700";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  const handleLogout = () => {
-    Swal.fire({
+  const isDashboard = location.pathname.startsWith("/dashboard");
+
+  const navItemStyle =
+    "block font-medium text-gray-700 hover:text-blue-600 transition";
+
+  const dashboardLink = {
+    admin: "/dashboard/admin-home",
+    staff: "/dashboard/staff-home",
+    citizen: "/dashboard/citizen-home",
+  };
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
       title: "Are you sure?",
-      text: "You will be logged out from CityFix!",
+      text: "You will be logged out!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, Logout",
-      cancelButtonText: "Cancel",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await logOut();
-        Swal.fire({
-          title: "Logged Out!",
-          text: "You have successfully logged out.",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
+      confirmButtonText: "Logout",
     });
+
+    if (result.isConfirmed) {
+      await logOut();
+      Swal.fire("Logged out", "", "success");
+    }
   };
 
   return (
-    <nav className="w-full bg-white border-b border-slate-200 py-4 shadow-sm sticky top-0 z-50">
-      <div className="flex items-center justify-between px-4 md:px-8">
+    <nav className="sticky top-0 z-50 bg-white border-b shadow-sm">
+      <div className="flex items-center justify-between px-4 md:px-8 h-16">
 
         {/* LOGO */}
-        <Link to="/" className="text-3xl font-bold text-blue-600 tracking-wide">
+        <Link to="/" className="text-2xl font-bold text-blue-600">
           CityFix
         </Link>
 
         {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-8">
-          <NavLink to="/" className={navItemStyle}>Home</NavLink>
-          <NavLink to="/issues" className={navItemStyle}>All Issues</NavLink>
-          <NavLink to="/about" className={navItemStyle}>About Us</NavLink>
-          <NavLink to="/contact" className={navItemStyle}>Contact</NavLink>
-        </div>
+        <div className="hidden md:flex items-center gap-6">
+          {!isDashboard && (
+            <>
+              <NavLink to="/" className={navItemStyle}>Home</NavLink>
+              <NavLink to="/issues" className={navItemStyle}>Issues</NavLink>
+              <NavLink to="/about" className={navItemStyle}>About</NavLink>
+              <NavLink to="/contact" className={navItemStyle}>Contact</NavLink>
+            </>
+          )}
 
-        {/* PROFILE / LOGIN */}
-        <div className="hidden md:block relative">
+          {/* PROFILE DROPDOWN */}
           {!user ? (
             <Link
               to="/login"
-              className="text-blue-600 font-semibold border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition"
+              className="border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-600 hover:text-white"
             >
               Login
             </Link>
           ) : (
-            <>
-              <img
-                src={user.photoURL}
-                alt="profile"
-                className="h-10 w-10 rounded-full cursor-pointer border"
-                onClick={() => setOpen(!open)}
-              />
-              {open && (
-                <div className="absolute right-0 mt-2 bg-white shadow-lg border w-48 rounded-lg p-3">
-                  <p className="font-semibold text-gray-700 mb-2">{user.displayName || "User"}</p>
+            <div className="relative">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
+              >
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="profile"
+                    className="w-9 h-9 rounded-full border"
+                  />
+                ) : (
+                  <FaUserCircle className="text-3xl" />
+                )}
+              </button>
 
-                  {/* Only show dashboard links after role loading */}
-                  {!loading && role === "admin" && <Link to="/dashboard/admin-home" className="block text-blue-600 hover:underline">Admin Dashboard</Link>}
-                  {!loading && role === "staff" && <Link to="/dashboard/staff-home" className="block text-blue-600 hover:underline">Staff Dashboard</Link>}
-                  {!loading && role === "citizen" && <Link to="/dashboard/citizen-home" className="block text-blue-600 hover:underline">My Dashboard</Link>}
+              {profileOpen && (
+                <div className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg p-3 space-y-2">
+                  <p className="text-sm font-semibold text-gray-700 truncate">
+                    {user.displayName || "User"}
+                  </p>
 
-                  {loading && <p className="text-gray-500">Loading...</p>}
+                  {!loading && (
+                    <Link
+                      to={dashboardLink[role]}
+                      className="block text-blue-600 font-medium hover:underline"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
 
-                  <button onClick={handleLogout} className="text-red-500 mt-3 font-medium">Logout</button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-center text-red-500 font-medium py-1 hover:bg-red-50 rounded transition"
+                  >
+                    Logout
+                  </button>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
 
         {/* MOBILE MENU BUTTON */}
-        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-2xl text-gray-700">☰</button>
+        <button
+          className="md:hidden text-xl"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <FaTimes /> : <FaBars />}
+        </button>
       </div>
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t p-4 space-y-3">
-          <NavLink to="/" className={navItemStyle}>Home</NavLink>
-          <NavLink to="/issues" className={navItemStyle}>All Issues</NavLink>
-          <NavLink to="/about" className={navItemStyle}>About Us</NavLink>
-          <NavLink to="/contact" className={navItemStyle}>Contact</NavLink>
+        <div className="md:hidden px-4 pb-4 space-y-4 border-t">
 
-          {!user ? (
-            <Link to="/login" className="block text-blue-600 border border-blue-600 px-4 py-2 rounded-lg w-max">Login</Link>
-          ) : (
-            <div className="pt-3 border-t">
-              <p className="font-semibold">{user.displayName}</p>
+          {!isDashboard && (
+            <>
+              <NavLink to="/" className={navItemStyle}>Home</NavLink>
+              <NavLink to="/issues" className={navItemStyle}>Issues</NavLink>
+              <NavLink to="/about" className={navItemStyle}>About</NavLink>
+              <NavLink to="/contact" className={navItemStyle}>Contact</NavLink>
+            </>
+          )}
 
-              {!loading && role === "admin" && <Link to="/dashboard/admin-home" className="text-blue-600 block mt-2">Admin Dashboard</Link>}
-              {!loading && role === "staff" && <Link to="/dashboard/staff-home" className="text-blue-600 block mt-2">Staff Dashboard</Link>}
-              {!loading && role === "citizen" && <Link to="/dashboard/citizen-home" className="text-blue-600 block mt-2">My Dashboard</Link>}
+          {/* MOBILE PROFILE */}
+          {user ? (
+            <div className="pt-3 border-t space-y-2">
+              <p className="font-semibold text-gray-700">
+                {user.displayName || "User"}
+              </p>
 
-              {loading && <p className="text-gray-500 mt-2">Loading...</p>}
+              {!loading && (
+                <Link
+                  to={dashboardLink[role]}
+                  className="block text-blue-600 font-medium"
+                >
+                  Dashboard
+                </Link>
+              )}
 
-              <button className="text-red-500 mt-3 font-medium" onClick={handleLogout}>Logout</button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-center text-red-500 font-medium py-2 hover:bg-red-50 rounded"
+              >
+                Logout
+              </button>
+
             </div>
+          ) : (
+            <Link to="/login" className="text-blue-600 font-medium">
+              Login
+            </Link>
           )}
         </div>
       )}

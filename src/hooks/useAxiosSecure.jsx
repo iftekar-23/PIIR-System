@@ -21,7 +21,7 @@ const useAxiosSecure = () => {
 
         if (user) {
           const token = await user.getIdToken(); // Firebase token
-          config.headers.Authorization = `Bearer ${token}`;
+          config.headers.authorization = `Bearer ${token}`;
         }
 
         return config;

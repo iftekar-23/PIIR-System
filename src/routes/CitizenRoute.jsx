@@ -1,14 +1,17 @@
 import { Navigate } from "react-router";
 import useRole from "../hooks/useRole";
 import useAuth from "../hooks/useAuth";
-
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const CitizenRoute = ({ children }) => {
-  const { user } = useAuth();
-  const { role, loading } = useRole();
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading } = useRole();
+
+  if (authLoading || roleLoading) {
+    return <LoadingSpinner />;
+  }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
   if (role !== "citizen") return <Navigate to="/" replace />;
 
   return children;

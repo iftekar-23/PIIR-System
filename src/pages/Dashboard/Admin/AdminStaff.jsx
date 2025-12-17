@@ -1,90 +1,85 @@
-// src/pages/Dashboard/Admin/AdminStaff.jsx
 import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaBan, FaCheckCircle } from "react-icons/fa";
 
-const AdminStaff = () => {
+const AdminUsers = () => {
   const axiosSecure = useAxiosSecure();
-  const [staffList, setStaffList] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", photoURL: "", password: "" });
-  const [editEmail, setEditEmail] = useState(null);
 
-  const fetchStaff = async () => {
-    const res = await axiosSecure.get("/admin/staff");
-    setStaffList(res.data);
+  const [citizens, setCitizens] = useState([]);
+  const [staff, setStaff] = useState([]);
+  const [activeTab, setActiveTab] = useState("citizens");
+  const [loading, setLoading] = useState(true);
+
+  // Fetch citizens & staff separately (matches backend)
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [citizenRes, staffRes] = await Promise.all([
+        axiosSecure.get("/admin/users"),
+        axiosSecure.get("/admin/staff"),
+      ]);
+
+      setCitizens(citizenRes.data || []);
+      setStaff(staffRes.data || []);
+    } catch (err) {
+      console.error("Failed to load users", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchStaff();
+    fetchData();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (editEmail) {
-      await axiosSecure.patch(`/admin/staff/${editEmail}`, formData);
-    } else {
-      await axiosSecure.post("/admin/staff", formData);
-    }
-    setModalOpen(false);
-    setFormData({ name: "", email: "", phone: "", photoURL: "", password: "" });
-    setEditEmail(null);
-    fetchStaff();
+  const toggleBlock = async (email, isBlocked) => {
+    const action = isBlocked ? "unblock" : "block";
+    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+
+    const endpoint = isBlocked
+      ? `/admin/users/${email}/unblock`
+      : `/admin/users/${email}/block`;
+
+    await axiosSecure.patch(endpoint);
+    fetchData();
   };
 
-  const handleEdit = (staff) => {
-    setFormData({ name: staff.name, email: staff.email, phone: staff.phone, photoURL: staff.photoURL, password: "" });
-    setEditEmail(staff.email);
-    setModalOpen(true);
-  };
-
-  const handleDelete = async (email) => {
-    if (window.confirm("Are you sure you want to delete this staff?")) {
-      await axiosSecure.delete(`/admin/staff/${email}`);
-      fetchStaff();
-    }
-  };
-
-  return (
-    <div className="bg-white shadow rounded-lg p-5 space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Manage Staff</h2>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2"
-        >
-          <FaPlus /> Add Staff
-        </button>
-      </div>
-
-      {/* STAFF TABLE */}
-      <table className="w-full table-auto border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Email</th>
-            <th className="p-2 border">Phone</th>
-            <th className="p-2 border">Actions</th>
+  const Table = ({ data = [] }) => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="px-4 py-3 text-center">Name</th>
+            <th className="px-4 py-3 text-center">Email</th>
+            <th className="px-4 py-3 text-center">Role</th>
+            <th className="px-4 py-3 text-center">Premium</th>
+            <th className="px-4 py-3 text-center">Status</th>
           </tr>
         </thead>
         <tbody>
-          {staffList.map(staff => (
-            <tr key={staff._id} className="hover:bg-gray-50">
-              <td className="p-2 border">{staff.name}</td>
-              <td className="p-2 border">{staff.email}</td>
-              <td className="p-2 border">{staff.phone}</td>
-              <td className="p-2 border flex gap-2">
+          {data.map((u) => (
+            <tr key={u._id} className="border-t hover:bg-gray-50">
+              <td className="px-4 py-3 font-medium">{u.name || "N/A"}</td>
+              <td className="px-4 py-3">{u.email}</td>
+              <td className="px-4 py-3 capitalize">{u.role}</td>
+              <td className="px-4 py-3">
+                {u.isPremium ? (
+                  <span className="text-green-600 font-semibold">Yes</span>
+                ) : (
+                  <span className="text-gray-500">No</span>
+                )}
+              </td>
+              <td className="px-4 py-3 text-right">
                 <button
-                  onClick={() => handleEdit(staff)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded flex items-center gap-1"
+                  onClick={() => toggleBlock(u.email, u.isBlocked)}
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                    u.isBlocked
+                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      : "bg-red-100 text-red-700 hover:bg-red-200"
+                  }`}
                 >
-                  <FaEdit /> Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(staff.email)}
-                  className="bg-red-500 text-white px-3 py-1 rounded flex items-center gap-1"
-                >
-                  <FaTrash /> Delete
+                  {u.isBlocked ? <FaCheckCircle /> : <FaBan />}
+                  {u.isBlocked ? "Unblock" : "Block"}
                 </button>
               </td>
             </tr>
@@ -92,61 +87,51 @@ const AdminStaff = () => {
         </tbody>
       </table>
 
-      {/* MODAL FORM */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 space-y-4">
-            <h3 className="text-lg font-bold">{editEmail ? "Update Staff" : "Add Staff"}</h3>
-            <form className="space-y-2" onSubmit={handleSubmit}>
-              <input
-                className="w-full p-2 border rounded"
-                placeholder="Name"
-                value={formData.name}
-                onChange={e => setFormData({...formData, name: e.target.value})}
-                required
-              />
-              <input
-                className="w-full p-2 border rounded"
-                placeholder="Email"
-                type="email"
-                value={formData.email}
-                onChange={e => setFormData({...formData, email: e.target.value})}
-                required
-                disabled={!!editEmail}
-              />
-              <input
-                className="w-full p-2 border rounded"
-                placeholder="Phone"
-                value={formData.phone}
-                onChange={e => setFormData({...formData, phone: e.target.value})}
-                required
-              />
-              <input
-                className="w-full p-2 border rounded"
-                placeholder="Photo URL"
-                value={formData.photoURL}
-                onChange={e => setFormData({...formData, photoURL: e.target.value})}
-              />
-              {!editEmail && (
-                <input
-                  className="w-full p-2 border rounded"
-                  placeholder="Password"
-                  type="password"
-                  value={formData.password}
-                  onChange={e => setFormData({...formData, password: e.target.value})}
-                  required
-                />
-              )}
-              <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => {setModalOpen(false); setEditEmail(null)}} className="px-3 py-1 bg-gray-400 rounded">Cancel</button>
-                <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded">{editEmail ? "Update" : "Add"}</button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {data.length === 0 && (
+        <p className="text-center text-gray-500 py-6">No data found</p>
       )}
+    </div>
+  );
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading users...</div>;
+  }
+
+  return (
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+      <h2 className="text-2xl font-semibold">User & Staff Management</h2>
+
+      {/* Tabs */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setActiveTab("citizens")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium ${
+            activeTab === "citizens"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+        >
+          Citizens
+        </button>
+        <button
+          onClick={() => setActiveTab("staff")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium ${
+            activeTab === "staff"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+        >
+          Staff
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm p-4">
+        {activeTab === "citizens" && <Table data={citizens} />}
+        {activeTab === "staff" && <Table data={staff} />}
+      </div>
     </div>
   );
 };
 
-export default AdminStaff;
+export default AdminUsers;

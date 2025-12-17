@@ -2,25 +2,25 @@ import { Navigate, useLocation } from "react-router";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "../components/LoadingSpinner";
 
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
-const PrivateRoute = ({children}) => {
-
-    const {user, loading} = useAuth()
-    const location = useLocation();
-    console.log(location)
-
-    if(loading) {
-       return <LoadingSpinner></LoadingSpinner>
-    }
-
-    if(!user){
-       return <Navigate state={location.pathname} to='/login'></Navigate>
-    }
-
+  if (!user) {
     return (
-        children
+      <Navigate
+        to="/login"
+        state={{ from: location.pathname }}
+        replace
+      />
     );
+  }
+
+  return children;
 };
 
 export default PrivateRoute;
