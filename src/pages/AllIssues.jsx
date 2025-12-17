@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaArrowUp, FaSearch, FaFilter } from "react-icons/fa";
+import { FaArrowUp, FaSearch, FaFilter, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useAuth from "../hooks/useAuth";
@@ -21,11 +21,16 @@ const AllIssues = () => {
     const [statusFilter, setStatusFilter] = useState("");
     const [priorityFilter, setPriorityFilter] = useState("");
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(9); // 3x3 grid
+
     const { user } = useAuth();
     
     const headerRef = useRef(null);
     const filtersRef = useRef(null);
     const gridRef = useRef(null);
+    const paginationRef = useRef(null);
 
     // ⬇️ LOAD DATA
     useEffect(() => {
@@ -95,6 +100,74 @@ const AllIssues = () => {
             (search ? item.title.toLowerCase().includes(search.toLowerCase()) : true)
         );
     });
+
+    // PAGINATION LOGIC
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentIssues = filtered.slice(startIndex, endIndex);
+
+    // Reset to first page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, categoryFilter, statusFilter, priorityFilter]);
+
+    // Pagination handlers
+    const goToPage = (page) => {
+        setCurrentPage(page);
+        // Smooth scroll to top of grid
+        if (gridRef.current) {
+            gridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    const goToPrevious = () => {
+        if (currentPage > 1) {
+            goToPage(currentPage - 1);
+        }
+    };
+
+    const goToNext = () => {
+        if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+        }
+    };
+
+    // Generate page numbers for pagination
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (currentPage <= 3) {
+                for (let i = 1; i <= 4; i++) {
+                    pages.push(i);
+                }
+                pages.push('...');
+                pages.push(totalPages);
+            } else if (currentPage >= totalPages - 2) {
+                pages.push(1);
+                pages.push('...');
+                for (let i = totalPages - 3; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                pages.push(1);
+                pages.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pages.push(i);
+                }
+                pages.push('...');
+                pages.push(totalPages);
+            }
+        }
+        
+        return pages;
+    };
 
     if (loading) {
         return (
@@ -270,8 +343,8 @@ const AllIssues = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.7 }}
                 >
-                <AnimatePresence>
-                    {filtered.map((issue, index) => (
+                <AnimatePresence mode="wait">
+                    {currentIssues.map((issue, index) => (
                         <motion.div
                             key={issue._id}
                             initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -409,6 +482,166 @@ const AllIssues = () => {
                     ))}
                     </AnimatePresence>
                 </motion.div>
+
+                {/* PAGINATION */}
+                {totalPages > 1 && (
+                    <motion.div 
+                        ref={paginationRef}
+                        className="mt-16 flex justify-center"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.8 }}
+                    >
+                        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20">
+                            <div className="flex items-center gap-2">
+                                {/* Previous Button */}
+                                <motion.button
+                                    onClick={goToPrevious}
+                                    disabled={currentPage === 1}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-semibold transition-all duration-300 ${
+                                        currentPage === 1
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+                                    }`}
+                                    whileHover={currentPage === 1 ? {} : { scale: 1.05, y: -2 }}
+                                    whileTap={currentPage === 1 ? {} : { scale: 0.95 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.9 }}
+                                >
+                                    <FaChevronLeft className="text-sm" />
+                                    Previous
+                                </motion.button>
+
+                                {/* Page Numbers */}
+                                <div className="flex items-center gap-1 mx-4">
+                                    {getPageNumbers().map((page, index) => (
+                                        <motion.div
+                                            key={`${page}-${index}`}
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                                        >
+                                            {page === '...' ? (
+                                                <span className="px-3 py-2 text-gray-500">...</span>
+                                            ) : (
+                                                <motion.button
+                                                    onClick={() => goToPage(page)}
+                                                    className={`w-10 h-10 rounded-xl font-semibold transition-all duration-300 ${
+                                                        currentPage === page
+                                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                                                            : 'bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-600'
+                                                    }`}
+                                                    whileHover={{ 
+                                                        scale: 1.1,
+                                                        y: -2,
+                                                        boxShadow: currentPage === page 
+                                                            ? "0 10px 25px rgba(59, 130, 246, 0.3)"
+                                                            : "0 5px 15px rgba(0, 0, 0, 0.1)"
+                                                    }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                >
+                                                    {page}
+                                                </motion.button>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                {/* Next Button */}
+                                <motion.button
+                                    onClick={goToNext}
+                                    disabled={currentPage === totalPages}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-semibold transition-all duration-300 ${
+                                        currentPage === totalPages
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+                                    }`}
+                                    whileHover={currentPage === totalPages ? {} : { scale: 1.05, y: -2 }}
+                                    whileTap={currentPage === totalPages ? {} : { scale: 0.95 }}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.9 }}
+                                >
+                                    Next
+                                    <FaChevronRight className="text-sm" />
+                                </motion.button>
+                            </div>
+
+                            {/* Results Info */}
+                            <motion.div 
+                                className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.5, delay: 1 }}
+                            >
+                                <div className="text-sm text-gray-600 text-center sm:text-left">
+                                    Showing {startIndex + 1}-{Math.min(endIndex, filtered.length)} of {filtered.length} issues
+                                    {(search || categoryFilter || statusFilter || priorityFilter) && (
+                                        <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                                            Filtered
+                                        </span>
+                                    )}
+                                </div>
+                                
+                                {/* Quick Jump */}
+                                {totalPages > 5 && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-gray-600">Jump to:</span>
+                                        <motion.select
+                                            value={currentPage}
+                                            onChange={(e) => goToPage(parseInt(e.target.value))}
+                                            className="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                                            whileHover={{ scale: 1.05 }}
+                                        >
+                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                                <option key={page} value={page}>
+                                                    Page {page}
+                                                </option>
+                                            ))}
+                                        </motion.select>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* No Results Message */}
+                {filtered.length === 0 && !loading && (
+                    <motion.div 
+                        className="text-center py-20"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <motion.div
+                            className="text-6xl mb-4"
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                            🔍
+                        </motion.div>
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">No Issues Found</h3>
+                        <p className="text-gray-600 mb-6">
+                            Try adjusting your search criteria or filters to find more results.
+                        </p>
+                        <motion.button
+                            onClick={() => {
+                                setSearch("");
+                                setCategoryFilter("");
+                                setStatusFilter("");
+                                setPriorityFilter("");
+                                setCurrentPage(1);
+                            }}
+                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            Clear All Filters
+                        </motion.button>
+                    </motion.div>
+                )}
             </div>
         </motion.div>
     );
