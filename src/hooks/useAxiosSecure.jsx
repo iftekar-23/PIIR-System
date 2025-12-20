@@ -5,7 +5,8 @@ import useAuth from "./useAuth";
 import { useEffect } from "react";
 
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:3000"
+  // baseURL: import.meta.env.VITE_API_URL || 'https://piir-system-server.vercel.app'
+  baseURL: 'https://piir-system-server.vercel.app'
 });
 
 const useAxiosSecure = () => {
@@ -20,7 +21,7 @@ const useAxiosSecure = () => {
         const user = auth.currentUser;
 
         if (user) {
-          const token = await user.getIdToken(); // Firebase token
+          const token = await user.getIdToken(); 
           config.headers.authorization = `Bearer ${token}`;
         }
 

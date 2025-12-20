@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const saveUserToDB = async ({ name, email, photoURL }) => {
   try {
-    const res = await axios.post(`http://localhost:3000/users`, {
+    const res = await axios.post(`https://piir-system-server.vercel.app/users`, {
       name,
       email,
       photoURL,
