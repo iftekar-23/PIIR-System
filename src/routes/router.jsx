@@ -27,6 +27,7 @@ import AdminStaff from "../pages/Dashboard/Admin/AdminStaff";
 import AdminPayments from "../pages/Dashboard/Admin/AdminPayments";
 import AdminProfile from "../pages/Dashboard/Admin/AdminProfile";
 import SubscribeSuccess from "../pages/Dashboard/Citizen/SubscribeSuccess";
+import FeedbackForm from "../pages/Dashboard/Citizen/FeedbackForm";
 
 export const router = createBrowserRouter([
     {
@@ -143,6 +144,14 @@ export const router = createBrowserRouter([
                 element: (
                     <CitizenRoute>
                         <Profile />
+                    </CitizenRoute>
+                ),
+            },
+            {
+                path: "citizen-rating",
+                element: (
+                    <CitizenRoute>
+                        <FeedbackForm />
                     </CitizenRoute>
                 ),
             },

@@ -1,13 +1,15 @@
 import { Link } from "react-router";
 import { FaHome, FaList, FaPlus, FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { MdFeedback } from "react-icons/md";
 
 const CitizenSidebar = () => {
   const menuItems = [
     { to: "/dashboard/citizen-home", label: "Dashboard", icon: <FaHome /> },
     { to: "/dashboard/my-issues", label: "My Issues", icon: <FaList /> },
     { to: "/dashboard/submit-issue", label: "Submit Issue", icon: <FaPlus /> },
-    { to: "/dashboard/citizen-profile", label: "Profile", icon: <FaUser /> }
+    { to: "/dashboard/citizen-profile", label: "Profile", icon: <FaUser /> },
+    { to: "/dashboard/citizen-rating", label: "Rating", icon: <MdFeedback />}
   ];
 
   return (

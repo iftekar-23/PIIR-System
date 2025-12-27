@@ -249,6 +249,7 @@ const IssueDetails = () => {
                     </div>
                 </div>
             </div>
+            
         </div>
     );
 };
