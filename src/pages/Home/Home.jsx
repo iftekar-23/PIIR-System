@@ -47,7 +47,7 @@ const Home = () => {
                 <PremiumSection />
                 <FAQ />
                 <Newsletter />
-                <CallToAction />
+                
             </motion.div>
 
             {/* Floating action button */}
