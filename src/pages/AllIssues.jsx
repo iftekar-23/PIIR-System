@@ -23,7 +23,7 @@ const AllIssues = () => {
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(9); // 3x3 grid
+    const [itemsPerPage] = useState(12); // 3x4 grid
 
     const { user } = useAuth();
     
@@ -338,7 +338,7 @@ const AllIssues = () => {
                 {/* GRID */}
                 <motion.div 
                     ref={gridRef}
-                    className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                    className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.7 }}

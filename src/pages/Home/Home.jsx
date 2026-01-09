@@ -1,10 +1,17 @@
 import { motion } from 'framer-motion';
 import Banner from '../../components/Banner';
 import Features from '../../components/Features';
+import Services from '../../components/Services';
+import Categories from '../../components/Categories';
+import Statistics from '../../components/Statistics';
 import HowItWorks from '../../components/HowItWorks';
 import ImpactSection from '../../components/ImpactSection';
+import Testimonials from '../../components/Testimonials';
 import PremiumSection from '../../components/PremiumSection';
 import LatestResolvedIssues from '../../components/LatestResolvedIssues';
+import FAQ from '../../components/FAQ';
+import Newsletter from '../../components/Newsletter';
+import CallToAction from '../../components/CallToAction';
 
 const Home = () => {
     return (
@@ -30,10 +37,17 @@ const Home = () => {
                 transition={{ duration: 0.8, delay: 0.3 }}
             >
                 <Features />
+                <Services />
+                <Categories />
+                <Statistics />
                 <LatestResolvedIssues />
                 <HowItWorks />
                 <ImpactSection />
+                <Testimonials />
                 <PremiumSection />
+                <FAQ />
+                <Newsletter />
+                <CallToAction />
             </motion.div>
 
             {/* Floating action button */}
